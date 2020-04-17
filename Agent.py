@@ -243,7 +243,7 @@ class Gameagent:
     ## Making video of testing phase of the environment
 
     def make_video(self,agent):
-        self.env = wrap_env(self.env)
+        self.env = self.wrap_env()
         rewards = 0
         steps = 0
         done = False
@@ -274,9 +274,12 @@ class Gameagent:
         rewards_ax.set_ylabel('Rewards')
         plt.show()
 
-    def test(self,agent):
-        make_video(agent)
-        show_video()
+    def test(self,agent_name):
+        if(agent_name == 'dqn'):
+            self.make_video(self.agent)
+        else:
+            self.make_video(self.DDQagent)
+        self.show_video()
         
     ## training loop for DQN
 
