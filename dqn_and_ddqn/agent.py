@@ -18,6 +18,7 @@ import base64
 from IPython.display import HTML
 import random
 from IPython import display as ipythondisplay
+from IPython.display import clear_output
 
 
 
@@ -45,6 +46,7 @@ class Qnetwork(tf.keras.Model):
         output = self.output_layer(x)
         return output
 
+
 #Experience Buffer class for storing experiences
 
 class ExperienceBuffer:
@@ -62,7 +64,7 @@ class ExperienceBuffer:
 ## DQN agent
 
 class DQNAgent:
-    def __init__(self,train_net,gamma,  batch_size,num_actions):
+    def __init__(self,train_net,gamma,batch_size,num_actions):
         self.train_net = train_net
         self.gamma = gamma
         self.batch_size = batch_size
@@ -182,7 +184,7 @@ class DDQNAgent:
         return loss
 
 class Gameagent:
-    def __init__(self,environment,max_epsilon=1,min_epsilon = 0.01,lambda_ = 0.0005,gamma = 0.95, batch_size = 32, tau=0.08, max_experiences=400000,min_experiences = 96,hidden_units =[30,30], lr =0.001,num_episodes = 500):
+    def __init__(self,environment,max_epsilon=1,min_epsilon = 0.01,lambda_ = 0.0005,gamma = 0.95, batch_size = 32, tau=0.08, max_experiences=400000,min_experiences = 96,hidden_units =[30,30], lr =0.001,num_episodes = 300):
         #Define global varaiables
         self.max_epsilon = max_epsilon
         self.min_epsilon = min_epsilon
@@ -291,6 +293,7 @@ class Gameagent:
         render = False
         steps = 0
         for i in range( self.num_episodes):
+            clear_output(wait=True)
             rewards = 0
             state = self.env.reset()
             iteration = 0
@@ -332,6 +335,7 @@ class Gameagent:
         render = False
         steps = 0
         for i in range( self.num_episodes):
+            clear_output(wait=True)
             rewards = 0
             state = self.env.reset()
             iteration = 0
@@ -367,11 +371,11 @@ class Gameagent:
     ## saving training variables
     
     def save_training_variable(self,agent_name,train_steps,train_rewards,train_losses):
-        path = "./"+self.env_name+"/"+agent_name+"/training_variables/"
+        path = "./assets/"+self.env_name+"/"+agent_name+"/training_variables/"
         try:
             os.makedirs(path)
         except OSError:
-            print ("Creation of the directory %s failed" % path)
+            print ("%s Directory already created" % path)
         else:
             print ("Successfully created the directory %s" % path)
         np.save(path+"train_steps",np.array(train_steps))
@@ -382,20 +386,20 @@ class Gameagent:
     
     def load_training_variable(self,agent_name):
         
-        train_steps = np.load("./"+self.env_name+"/"+agent_name+"/training_variables/train_steps.npy")
-        train_rewards = np.load("./"+self.env_name+"/"+agent_name+"/training_variables/train_rewards.npy")
-        train_losses = np.load("./"+self.env_name+"/"+agent_name+"/training_variables/train_losses.npy")
+        train_steps = np.load("./assets/"+self.env_name+"/"+agent_name+"/training_variables/train_steps.npy")
+        train_rewards = np.load("./assets/"+self.env_name+"/"+agent_name+"/training_variables/train_rewards.npy")
+        train_losses = np.load("./assets/"+self.env_name+"/"+agent_name+"/training_variables/train_losses.npy")
         
         return train_steps,train_rewards,train_losses
     
     ## save weights
         
     def save_weights(self,agent_name):
-        path = "./"+self.env_name+"/"+agent_name+"/weights/"
+        path = "./assets/"+self.env_name+"/"+agent_name+"/weights/"
         try:
             os.makedirs(path)
         except OSError:
-            print ("Creation of the directory %s failed" % path)
+            print ("%s Directory already created" % path)
         else:
             print ("Successfully created the directory %s" % path)
        
@@ -405,12 +409,23 @@ class Gameagent:
             self.train_net.save_weights(path+self.env_name+"_"+agent_name+".h5")
     
     ## load weights
-        
+    # Subclass implementation cannot be load until it called on some data atleast once. 
+    # in order to load the weights, have to run model once.
+    ## https://www.tensorflow.org/guide/keras/save_and_serialize
+    
     def load_weights(self,agent_name):
         if(agent_name == 'dqn'):
-            self.dqn.load_weights("./"+self.env_name+"/"+agent_name+"/weights/"+self.env_name+"_"+agent_name+".h5")
+            self.num_episodes = 1
+            self.exp_buffer = ExperienceBuffer(1, 0)
+            t, l, r, = self.train_dqn()
+            clear_output(wait=True)
+            self.dqn.load_weights("./assets/"+self.env_name+"/"+agent_name+"/weights/"+self.env_name+"_"+agent_name+".h5")
         else:
-            self.train_net.save_weights("./"+self.env_name+"/"+agent_name+"/weights/"+self.env_name+"_"+agent_name+".h5")
+            self.num_episodes = 1
+            self.exp_buffer = ExperienceBuffer(1, 0)
+            t, l, r, = self.train_dqn()
+            clear_output(wait=True)
+            self.train_net.load_weights("./assets/"+self.env_name+"/"+agent_name+"/weights/"+self.env_name+"_"+agent_name+".h5")
         
         
     
