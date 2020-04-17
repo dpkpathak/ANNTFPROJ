@@ -4,7 +4,7 @@ from IPython.display import clear_output
 import gym
 import matplotlib.pyplot as plt
 
-from q_learning import MDP
+from .q_learning import MDP
 
 # Globals
 ALPHA = 0.1
