@@ -423,7 +423,7 @@ class Gameagent:
         else:
             self.num_episodes = 1
             self.exp_buffer = ExperienceBuffer(1, 0)
-            t, l, r, = self.train_dqn()
+            t, l, r, = self.train_ddqn()
             clear_output(wait=True)
             self.train_net.load_weights("./assets/"+self.env_name+"/"+agent_name+"/weights/"+self.env_name+"_"+agent_name+".h5")
         
