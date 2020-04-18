@@ -281,7 +281,9 @@ class Gameagent:
 
         rewards_ax.set_xlabel('Episode')
         rewards_ax.set_ylabel('Rewards')
-        plt.show()
+        # plt.show()
+        fig.suptitle(f'Visualization for {self.agent_name} agent in {self.env_name} environment:', fontsize=16)
+        return fig
 
     def test(self,agent_name):
         if(agent_name == 'dqn'):
@@ -392,6 +394,8 @@ class Gameagent:
     ## loading training variables
     
     def load_training_variable(self,agent_name):
+
+        self.agent_name = agent_name
         
         train_steps = np.load("./assets/"+self.env_name+"/"+agent_name+"/training_variables/train_steps.npy")
         train_rewards = np.load("./assets/"+self.env_name+"/"+agent_name+"/training_variables/train_rewards.npy")
