@@ -189,7 +189,9 @@ class DDQNAgent:
         return loss
 
 class Gameagent:
-    def __init__(self,environment,max_epsilon=1,min_epsilon = 0.01,lambda_ = 0.0005,gamma = 0.95, batch_size = 32, tau=0.08, max_experiences=400000,min_experiences = 96,hidden_units =[30,30], lr =0.001,num_episodes = 300):
+    def __init__(self,environment,max_epsilon=1,min_epsilon = 0.01,lambda_ = 0.0005,
+    gamma = 0.95, batch_size = 32, tau=0.08, max_experiences=400000,
+    min_experiences = 96,hidden_units =[30,30], lr =0.001,num_episodes = 300):
         #Define global varaiables
         self.max_epsilon = max_epsilon
         self.min_epsilon = min_epsilon

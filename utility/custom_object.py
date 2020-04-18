@@ -1,0 +1,2 @@
+class CustomObject:
+    pass
