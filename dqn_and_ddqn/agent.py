@@ -19,6 +19,7 @@ from IPython.display import HTML
 import random
 from IPython import display as ipythondisplay
 from IPython.display import clear_output
+import sys
 
 
 
@@ -189,9 +190,7 @@ class DDQNAgent:
         return loss
 
 class Gameagent:
-    def __init__(self,environment,max_epsilon=1,min_epsilon = 0.01,lambda_ = 0.0005,
-    gamma = 0.95, batch_size = 32, tau=0.08, max_experiences=400000,
-    min_experiences = 96,hidden_units =[30,30], lr =0.001,num_episodes = 300):
+    def __init__(self,environment,max_epsilon=1,min_epsilon = 0.01,lambda_ = 0.0005,gamma = 0.95, batch_size = 32, tau=0.08, max_experiences=400000,min_experiences = 96,hidden_units =[30,30], lr =0.001,num_episodes = 300):
         #Define global varaiables
         self.max_epsilon = max_epsilon
         self.min_epsilon = min_epsilon
@@ -254,8 +253,11 @@ class Gameagent:
     ## Making video of testing phase of the environment
 
     def make_video(self,agent):
-        self.env = self.wrap_env()
-        rewards = 0
+        try: 
+            self.env = self.wrap_env()
+        except:
+            e = sys.exc_info()[0]
+            print("Can't save video in file")
         steps = 0
         done = False
         state = self.env.reset()
@@ -264,8 +266,8 @@ class Gameagent:
             action = agent.get_action(state,0)
             state, reward, done, info= self.env.step(action)
             steps += 1
-            rewards += reward
-        print("Testing steps: {} rewards {}: ".format(steps, rewards))
+        print("Testing rewards {}: ".format(steps))
+        return steps
     
     def visualise(self,train_steps,train_losses,train_rewards):
         fig = plt.figure(figsize=(16,5))
@@ -289,10 +291,11 @@ class Gameagent:
 
     def test(self,agent_name):
         if(agent_name == 'dqn'):
-            self.make_video(self.agent)
+            rewards = self.make_video(self.agent)
         else:
-            self.make_video(self.DDQagent)
+            rewards = self.make_video(self.DDQagent)
         self.show_video()
+        return rewards
         
     ## training loop for DQN
 
